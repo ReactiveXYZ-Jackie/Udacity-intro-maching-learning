@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+import os
+import sys
 import random
 import numpy
 import matplotlib.pyplot as plt
@@ -9,8 +11,11 @@ from outlier_cleaner import outlierCleaner
 
 
 ### load up some practice data with outliers in it
-ages = pickle.load( open("practice_outliers_ages.pkl", "r") )
-net_worths = pickle.load( open("practice_outliers_net_worths.pkl", "r") )
+age_file_path = os.path.join(os.path.dirname(__file__), '.', 'practice_outliers_ages.pkl')
+net_worths_file_path = os.path.join(os.path.dirname(__file__), '.', 'practice_outliers_net_worths.pkl')
+
+ages = pickle.load( open(age_file_path, "r") )
+net_worths = pickle.load( open(net_worths_file_path, "r") )
 
 
 
@@ -20,20 +25,20 @@ net_worths = pickle.load( open("practice_outliers_net_worths.pkl", "r") )
 ### and n_columns is the number of features
 ages       = numpy.reshape( numpy.array(ages), (len(ages), 1))
 net_worths = numpy.reshape( numpy.array(net_worths), (len(net_worths), 1))
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'tools'))
+
 from sklearn.cross_validation import train_test_split
 ages_train, ages_test, net_worths_train, net_worths_test = train_test_split(ages, net_worths, test_size=0.1, random_state=42)
 
 ### fill in a regression here!  Name the regression object reg so that
 ### the plotting code below works, and you can see what your regression looks like
+from sklearn.linear_model import LinearRegression
+reg = LinearRegression()
+reg.fit(ages_train,net_worths_train)
+print "The first regression has a slope of: {0}".format(reg.coef_)
 
-
-
-
-
-
-
-
-
+print "The first regression produce a test R sq score of: {0}".format(reg.score(ages_test, net_worths_test))
 
 
 try:
@@ -68,7 +73,11 @@ if len(cleaned_data) > 0:
     ### refit your cleaned data!
     try:
         reg.fit(ages, net_worths)
-        plt.plot(ages, reg.predict(ages), color="blue")
+
+        print "New regression with slope: {0}".format(reg.coef_)
+
+
+        plt.plot(ages, reg.predict(ages), color="red")
     except NameError:
         print "you don't seem to have regression imported/created,"
         print "   or else your regression object isn't named reg"

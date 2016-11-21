@@ -12,12 +12,15 @@
     You fill in the regression code where indicated:
 """    
 
-
+import os
 import sys
 import pickle
-sys.path.append("../tools/")
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'tools'))
 from feature_format import featureFormat, targetFeatureSplit
-dictionary = pickle.load( open("../final_project/final_project_dataset_modified.pkl", "r") )
+
+filePath = os.path.join(os.path.dirname(__file__), '..', 'final_project/final_project_dataset_modified.pkl')
+
+dictionary = pickle.load( open(filePath, "r") )
 
 ### list the features you want to look at--first item in the 
 ### list will be the "target" feature
@@ -29,7 +32,7 @@ target, features = targetFeatureSplit( data )
 from sklearn.cross_validation import train_test_split
 feature_train, feature_test, target_train, target_test = train_test_split(features, target, test_size=0.5, random_state=42)
 train_color = "b"
-test_color = "b"
+test_color = "r"
 
 
 
@@ -37,11 +40,21 @@ test_color = "b"
 ### Please name it reg, so that the plotting code below picks it up and 
 ### plots it correctly. Don't forget to change the test_color above from "b" to
 ### "r" to differentiate training points from test points.
+from sklearn.linear_model import LinearRegression
+reg = LinearRegression()
+reg.fit(feature_train, target_train)
 
+slope = reg.coef_
+print "Linear regression coefficient: {0}".format(slope)
 
+intercept = reg.intercept_
+print "Linear regression intercept: {0}".format(intercept)
 
+train_score = reg.score(feature_train, target_train)
+print "Training R sq score: {0}".format(train_score)
 
-
+test_score = reg.score(feature_test, target_test)
+print "Testing R sq score: {0}".format(test_score)
 
 
 
@@ -64,6 +77,11 @@ try:
     plt.plot( feature_test, reg.predict(feature_test) )
 except NameError:
     pass
+reg.fit(feature_test, target_test)
+plt.plot(feature_train, reg.predict(feature_train), color="g") 
+
+print "Slope of predicted slope: {0}".format(reg.coef_)
+
 plt.xlabel(features_list[1])
 plt.ylabel(features_list[0])
 plt.legend()
