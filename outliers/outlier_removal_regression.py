@@ -75,6 +75,7 @@ if len(cleaned_data) > 0:
         reg.fit(ages, net_worths)
 
         print "New regression with slope: {0}".format(reg.coef_)
+        print "New regression's score: {0}".format(reg.score(ages_test,net_worths_test))
 
 
         plt.plot(ages, reg.predict(ages), color="red")

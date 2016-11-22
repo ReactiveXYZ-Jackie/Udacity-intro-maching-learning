@@ -19,11 +19,7 @@ def outlierCleaner(predictions, ages, net_worths):
         x: abs(net_worths[x][0]-predictions[x][0]) for x in range(len(ages))
     }
 
-    print residuals
-
     residuals_sorted_keys = sorted(residuals, key = residuals.get)
-
-    print residuals_sorted_keys
 
     key_len = len(residuals_sorted_keys)
 
