@@ -123,6 +123,16 @@ def targetFeatureSplit( data ):
 
     return target, features
 
+def targetFeatureCombine(poi, features):
+    
+    counter = 0
+    new_features = []
+
+    for feature in features:
+        new_features.append([poi[counter]] + features[counter].tolist())
+        counter = counter + 1
+
+    return np.array(new_features)
 
 
 
