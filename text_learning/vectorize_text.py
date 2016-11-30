@@ -5,7 +5,7 @@ import pickle
 import re
 import sys
 
-sys.path.append( "../tools/" )
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'tools'))
 from parse_out_email_text import parseOutText
 
 """
@@ -22,9 +22,10 @@ from parse_out_email_text import parseOutText
     The data is stored in lists and packed away in pickle files at the end.
 """
 
-
-from_sara  = open("from_sara.txt", "r")
-from_chris = open("from_chris.txt", "r")
+sara_path = os.path.join(os.path.dirname(__file__), 'from_sara.txt')
+from_sara  = open(sara_path, "r")
+chris_path = os.path.join(os.path.dirname(__file__), 'from_chris.txt')
+from_chris = open(chris_path, "r")
 
 from_data = []
 word_data = []
@@ -41,35 +42,38 @@ for name, from_person in [("sara", from_sara), ("chris", from_chris)]:
     for path in from_person:
         ### only look at first 200 emails when developing
         ### once everything is working, remove this line to run over full dataset
-        temp_counter += 1
-        if temp_counter < 200:
-            path = os.path.join('..', path[:-1])
-            print path
-            email = open(path, "r")
+        # temp_counter += 1
+        # if temp_counter < 200:
+        path = os.path.join('..', path[:-1])
+        # print path
+        email = open(path, "r")
 
-            ### use parseOutText to extract the text from the opened email
+        ### use parseOutText to extract the text from the opened email
+        words = parseOutText(email)
+        ### use str.replace() to remove any instances of the words
+        removeables = ["sara", "shackleton", "chris", "germani"]
+        for x in removeables:
+            words = words.replace(x, "")
+        ### append the text to word_data
+        word_data.append(words);
+        ### append a 0 to from_data if email is from Sara, and 1 if email is from Chris
+        from_data.append(0) if name == 'sara' else from_data.append(1)
 
-            ### use str.replace() to remove any instances of the words
-            ### ["sara", "shackleton", "chris", "germani"]
-
-            ### append the text to word_data
-
-            ### append a 0 to from_data if email is from Sara, and 1 if email is from Chris
-
-
-            email.close()
+        email.close()
 
 print "emails processed"
 from_sara.close()
 from_chris.close()
 
-pickle.dump( word_data, open("your_word_data.pkl", "w") )
-pickle.dump( from_data, open("your_email_authors.pkl", "w") )
+#pickle.dump( word_data, open("your_word_data.pkl", "w") )
+#pickle.dump( from_data, open("your_email_authors.pkl", "w") )
 
 
 
 
 
 ### in Part 4, do TfIdf vectorization here
-
-
+from sklearn.feature_extraction.text import TfidfVectorizer
+vectorizer = TfidfVectorizer(stop_words = 'english')
+vectorizer.fit(word_data)
+print vectorizer.get_feature_names()[34597]
